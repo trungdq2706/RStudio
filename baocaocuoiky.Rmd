@@ -1,0 +1,180 @@
+---
+title: "Báo cáo cuối kỳ"
+author: "Nhóm"
+date: "2022-10-24"
+output:
+  powerpoint_presentation:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+## Giới thiệu
+
+- Streamer là những người phát sóng trực tiếp khi họ chơi trò chơi điện tử, trò chuyện, hát, … 
+- Ngành streamer khá linh hoạt về thời gian làm việc, công cụ .
+- Mức lương cao làm cho ngành này trở nên khá “hot” đối với các bạn trẻ.
+- Thu nhập ngành liên quan rất nhiều đến lượt view, việc donate của các viewer.
+
+## Giới thiệu
+
+- Nhiều nền tảng livestream ra đời để đáp ứng mọi nhu cầu. Trong đó có Twitch :
+  - Là nơi mà các streamer hoạt động trong một cộng đồng. 
+  - Một trong những nền tảng livestream lớn nhất.
+  - Bao gồm nhiều streamer nổi tiếng của thế giới.
+  - Streamer thu hút được nhiều người xem hơn, đồng thời làm tăng việc thu nhập của họ .
+- Vậy chúng ta cùng nhau phân tích những yếu tố khách quan và chủ quan nào tạo nên một người streamer nổi tiếng. 
+
+
+## Mô tả dữ liệu
+
+- Dữ liệu gồm 11 cột, 1000 dòng.
+
+- Mô tả biến :
+
+## Mô tả dữ liệu
+
+:::::: {.columns}
+::: {.column}
+- Channel :Tên kênh của streamer 
+- Watch time (minutes): tổng thời gian xem của viewers cho streamer 
+- Stream time (minutes): Tổng thời gian streamer phát trực tiếp
+- Peak viewes : Lượt xem cao nhất của streamer 
+- Average viewers : Lượt xem trung bình của viewer
+:::
+
+::: {.column}
+- Followers : số người theo dõi kênh. 
+- Followers gained: số người theo dõi kênh đạt được sau 1 năm
+- Views gained:  Tổng số lượt xem đã đạt được sau 1 năm 
+- Partnered : Hợp tác với Twitch 
+- Mature: Độ tuổi được xem kênh  
+:::
+::::::
+   
+
+  
+  
+## Dữ liệu
+
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+data <- read.csv("twitchdata-update.csv")
+
+```
+
+- Có bao nhiêu quan sát và bao nhiêu biến trong tập dữ liệu? 
+- Những kênh ở đầu bảng ?
+- Những kênh ở cuối bảng  ?
+
+## Dữ liệu
+
+- Có bao nhiêu quan sát và bao nhiêu biến trong tập dữ liệu? 
+
+glimpse(data)
+
+```{r}
+
+knitr::include_graphics("img2.png")
+
+```
+
+
+
+## Dữ liệu
+
+- Những kênh ở đầu bảng ?
+
+```{r}
+data1 <- data %>% select(Channel,Followers,Peak.viewers)
+head(data1)
+
+```
+
+```{r}
+```
+
+## Dữ liệu
+
+Những kênh ở cuối bảng  ?
+
+```{r}
+tail(data1)
+
+```
+
+
+
+## Dữ liệu 
+
+Phân chia theo ngôn ngữ
+
+```{r}
+data2 <- data %>% group_by(Language) %>% 
+  summarise(n=n()) %>% 
+  arrange(desc(n))
+data2
+```
+
+## Biểu đồ
+
+```{r,fig.cap="Phân loại theo ngôn ngữ", echo=FALSE}
+data2 %>% ggplot(aes(x = n, y = Language, fill = Language)) +
+  geom_bar(stat="identity") + 
+  geom_text(aes(label=n),position = position_dodge(0.9),vjust=0)
+```
+ 
+## Biểu đồ
+
+```{r,fig.cap="Phân loại theo ngôn ngữ"}
+ggplot(data,aes(x=Language))+
+    geom_bar()+
+    coord_flip()
+```
+
+
+## Biểu đồ
+
+```{r,fig.cap="Phân loại trên dưới 18 tuổi"}
+ggplot(data,aes(x=Mature,fill = Mature))+
+    geom_bar()
+```
+## Biểu đồ
+
+```{r,fig.cap="Phân loại theo hợp tác với Twitch"}
+ggplot(data,aes(x=Partnered,fill = Partnered))+
+    geom_bar()
+```
+## Biểu đồ
+
+```{r,fig.cap="Biểu đồ theo số lượng người theo dõi có được trong năm"}
+ggplot(data,aes(x=Stream.time.minutes.,y=Followers.gained))+
+    geom_line()
+```
+
+## Biểu đồ
+
+```{r,fig.cap="Biều đồ theo số người xem trung bình"}
+ggplot(data)+
+    geom_line(aes(x=Stream.time.minutes.,y=Average.viewers))
+```
+
+## Biểu đồ
+
+```{r,fig.cap="Biểu đồ giữa độ trưởng thành và lượng người theo dõi"}
+ggplot(data,aes(y=Followers,x=Mature))+ 
+    scale_y_log10()+
+    geom_boxplot()
+```
+
+## Câu hỏi phân tích
+
+- Lượt followers có ảnh hưởng đến lượt average viewers hay không ?
+- Stream time có ảnh hưởng đến followers một của streamer hay không ?
+- Việc Mature của kênh streamer đó có ảnh hưởng đến lượt followers không ?
+- Việc sử dụng Language của streamer có liên quan gì đến lượng follower hay không ?
